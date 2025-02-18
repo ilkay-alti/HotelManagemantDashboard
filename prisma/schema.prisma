@@ -1,0 +1,131 @@
+// Prisma Schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Room Model
+model Room {
+  id          String      @id @default(cuid())
+  roomNumber  String      @unique
+  bedTypeId   String
+  floor       Int
+  price       Float
+  isAvailable Boolean     @default(true)
+  roomTypeId  String
+  bookings    Booking[]
+  statusId    String      // statusId alanı eklendi
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+
+  bedType     BedType     @relation(fields: [bedTypeId], references: [id])
+  status      RoomStatus  @relation(fields: [statusId], references: [id]) 
+  roomType    RoomType    @relation(fields: [roomTypeId], references: [id])
+}
+
+// RoomStatus Model
+model RoomStatus {
+  id          String    @id @default(cuid())
+  status      String    @unique
+  rooms       Room[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// BedType Model
+model BedType {
+  id          String    @id @default(cuid())
+  type        String    @unique
+  description String
+  rooms       Room[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// RoomType Model
+model RoomType {
+  id          String    @id @default(cuid())
+  type        String    @unique
+  description String
+  rooms       Room[]
+  deals       Deal[] // Many-to-Many ilişkinin karşı tarafı
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Booking Model
+model Booking {
+  id           String    @id @default(cuid())
+  customerId   String
+  roomId       String
+  checkInDate  DateTime
+  checkOutDate DateTime
+  totalPrice   Float
+  payments     Payment[] // One-to-Many ilişki
+
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  room         Room      @relation(fields: [roomId], references: [id])
+  customer     Customer  @relation(fields: [customerId], references: [id])
+}
+
+// Customer Model
+model Customer {
+  id          String    @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String    @unique
+  phone       String
+  bookings    Booking[]
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Payment Model
+model Payment {
+  id          String    @id @default(cuid())
+  bookingId   String    
+  amount      Float
+  paymentDate DateTime
+  status      String    @default("Pending")
+
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  
+  booking     Booking   @relation(fields: [bookingId], references: [id])
+}
+
+// Deal Model
+model Deal {
+  id             String    @id @default(cuid())
+  refferalCode   String    @unique @default(uuid())
+  tags           Tags[]
+  dealName       String
+  price          Float
+  discount       Float
+  roomTypes      RoomType[] // Many-to-Many ilişki
+  startDate      DateTime
+  endDate        DateTime
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+// Tags Model
+model Tags {
+  id        String    @id @default(cuid())
+  tag       String
+  deals     Deal[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
