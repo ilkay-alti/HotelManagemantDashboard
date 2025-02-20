@@ -155,3 +155,41 @@ export async function PUT(req: Request) {
     );
   }
 }
+
+// DELETE - Delete a RoomStatus
+
+export async function DELETE(req: Request) {
+  try {
+    const { id } = await req.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "ID is required for deleting" },
+        { status: 400 },
+      );
+    }
+
+    await prisma.booking.delete({
+      where: { id },
+    });
+
+    return NextResponse.json(
+      { message: "Booking Deleted Successfully" },
+      { status: 200 },
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return NextResponse.json(
+        { error: error.message, message: "Error Deleting Booking" },
+        { status: 500 },
+      );
+    }
+    return NextResponse.json(
+      {
+        error: "An unknown error occurred",
+        message: "Error Deleting Booking",
+      },
+      { status: 500 },
+    );
+  }
+}
