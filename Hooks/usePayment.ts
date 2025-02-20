@@ -78,7 +78,7 @@ export const usePayment = () => {
     queryFn: fetchPayments,
   });
   //Fetch a Payment by id
-  const usePayment = (id: string) => {
+  const usePaymentById = (id: string) => {
     return useQuery({
       queryKey: ["payment", id],
       queryFn: () => fetchIDPayment(id),
@@ -115,7 +115,7 @@ export const usePayment = () => {
 
   return {
     usePayments,
-    usePayment,
+    usePaymentById,
     createPaymentMutation,
     updatePaymentMutation,
     deletePaymentMutation,
