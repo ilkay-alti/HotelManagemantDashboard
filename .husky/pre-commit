@@ -1,2 +1,4 @@
 
 bun  lint-staged --concurrent false
+
+npm test 
